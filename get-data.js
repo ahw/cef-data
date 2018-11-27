@@ -9,6 +9,14 @@ function getUrl(params) {
 
 function getQueryString(params) {
     const { secid, price, nav } = params;
+    // https://mschart.morningstar.com/chartweb/defaultChart?
+    //  type=gettid
+    //  symbol=XNYS%3ANAN%2C
+    //  region=usa
+    //  ifmt=0
+    //  callback=jQuery16404078118428976243_1543322754649
+    //  _=1543322760367
+
     // 8225 = price, 8217 = nav
     const dataid = params.dimension === 'price' ? 8225 : 8217;
     return {
