@@ -54,10 +54,13 @@ Promise.map(funds, fund => (
     })
 )).then(responses => {
     const headers = funds.map(fund => `${fund.symbol} ${fund.dimension}`);
-    printCombinedDataset(['Date'].concat(headers), responses);
+    getCombinedDataset(['Date'].concat(headers), responses, function(row) {
+        console.log(row.join('\t'))
+    });
 });
 
-function printCombinedDataset(headers, responses) {
+function getCombinedDataset(headers, responses, mapper = function() {}) {
+    mapper.call(null, headers);
     const allSeries = responses.map(series => series.data.r[0].t[0].d);
     const startMoment = allSeries
         .map(series => series[0].i)
