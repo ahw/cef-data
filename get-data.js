@@ -72,26 +72,23 @@ function getCombinedDataset(headers, responses, mapper = function() {}) {
         .reduce((curr, prev) => curr > prev ? curr : prev);
 
     const currentPointers = responses.map(v => 0); // An array filled with zeroes
-    const columns = [];
     let currentMoment = moment(startMoment); // clone
-    console.log(headers.join('\t'));
     do {
-        const column = currentPointers.map((currentPointer, i) => {
+        const rowData = currentPointers.map((currentPointer, i) => {
             const data = allSeries[i][currentPointer];
             const dataMoment = moment(data.i);
             if (dataMoment.isSame(currentMoment)) {
                 ++currentPointers[i];
                 return parseFloat(data.v);
             } else {
-                // console.log(`data for date ${data.i} does not match current moment ${currentMoment}; skipping`);
                 return '';
             }
         });
 
-        const fullColumn = [currentMoment.format('MM/DD/YYYY')].concat(column);
+        const fullRowData = [currentMoment.format('MM/DD/YYYY')].concat(rowData);
         currentMoment.add(1, 'days');
-        if (column.some(v => v)) {
-            console.log(fullColumn.join('\t'));
+        if (rowData.some(v => v)) {
+            mapper.call(null, fullRowData);
         }
     } while (currentMoment.isBefore(endMoment))
 }
