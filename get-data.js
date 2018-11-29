@@ -83,23 +83,29 @@ Promise.map(funds, fund => (
 
 function getCombinedDataset(headers, responses, mapper = function() {}) {
     mapper.call(null, headers);
-    const allSeries = responses.map(series => series.data.r[0].t[0].d);
+    const allSeries = responses.map(series => _get(series, 'data.r[0].t[0].d', []));
     const startMoment = allSeries
-        .map(series => series[0].i)
+        // If not defined, set fake start date to Jan 1, 3000 so as to
+        // ensure this series is not chosen as the earliest
+        .map(series => _get(series, '[0].i', '3000-01-01'))
         .map(rawDate => moment(rawDate))
         .reduce((curr, prev) => curr < prev ? curr : prev);
     const endMoment = allSeries
-        .map(series => series[series.length - 1].i)
+        // If not defined, set fake end date to Jan 1, 1000 so as to ensure
+        // this serires is not chosen as the latest
+        .map(series => _get(series, `[${series.length - 1}].i`, '1000-01-01'))
         .map(rawDate => moment(rawDate))
         .reduce((curr, prev) => curr > prev ? curr : prev);
 
     const currentPointers = responses.map(v => 0); // An array filled with zeroes
+    console.log(`startMoment ${startMoment} endMoment ${endMoment}`);
     let currentMoment = moment(startMoment); // clone
     do {
         const rowData = currentPointers.map((currentPointer, i) => {
             const data = allSeries[i][currentPointer];
-            const dataMoment = moment(data.i);
-            if (dataMoment.isSame(currentMoment)) {
+            if (typeof data === 'undefined' || typeof data.i === 'undefined') {
+                return '';
+            } else if (moment(data.i).isSame(currentMoment)) {
                 ++currentPointers[i];
                 return parseFloat(data.v);
             } else {
