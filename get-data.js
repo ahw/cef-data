@@ -1,10 +1,24 @@
 #!/Users/andrew/.nvm/versions/node/v8.11.2/bin/node
 const Promise = require('bluebird');
 const rp = require('request-promise');
+const _get = require('lodash/get');
 const moment = require('moment');
 
 function getUrl(params) {
     return `http://mschart.morningstar.com/chartweb/defaultChart`;
+}
+
+function getDataIdFromDimension(dimension) {
+    switch (dimension) {
+        case 'nav':
+            return 8217;
+        case 'volume':
+            return 8226;
+        case 'price':
+            return 8225;
+        default:
+            return dimension;
+    }
 }
 
 function getQueryString(params) {
