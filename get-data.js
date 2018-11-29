@@ -75,7 +75,7 @@ Promise.map(funds, fund => (
         json: true
     })
 )).then(responses => {
-    const headers = funds.map(fund => `${fund.symbol} ${fund.dimension}`);
+    const headers = funds.map(fund => `${fund.symbol} ${getDataIdFromDimension(fund.dimension)} ${fund.dimension}`);
     getCombinedDataset(['Date'].concat(headers), responses, function(row) {
         console.log(row.join('\t'))
     });
